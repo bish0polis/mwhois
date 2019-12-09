@@ -1,0 +1,11 @@
+[Unit]
+Description=mwhoisd server
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/bin/sh -c 'cd /opt/mwhois; ./mwhoisd &'
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
