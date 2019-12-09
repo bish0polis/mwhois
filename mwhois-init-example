@@ -1,0 +1,56 @@
+#!/bin/bash
+# init file for mwhois
+#
+# chkconfig: - 50 50
+# description: mwhois Daemon
+#
+RETVAL=0
+prog="mwhois"
+
+start() {
+        echo -n $"Starting $prog: "
+        if [ $UID -ne 0 ]; then
+                RETVAL=1
+                failure
+        else
+                cd /opt/mwhois; ./mwhoisd &
+                RETVAL=$?
+        fi;
+        echo
+        return $RETVAL
+}
+
+stop() {
+        echo -n $"Stopping $prog: "
+        if [ $UID -ne 0 ]; then
+                RETVAL=1
+                failure
+        else
+                pkill -9 mwhoisd
+                RETVAL=$?
+        fi;
+        echo
+        return $RETVAL
+}
+
+restart(){
+        stop
+        start
+}
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart)
+        restart
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart}"
+        RETVAL=1
+esac
+
+exit $RETVAL
