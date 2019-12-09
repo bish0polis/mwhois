@@ -3,10 +3,10 @@ Copyright (c) 2015 Antonios A. Chariton <daknob.mac@gmail.com>
 
 Description: 
 mwhois is a server software compatible with the whois(1) command
-on most linux and unix systems.  It is  fully compliant with the
-RFC 3912. It can serve domain name and  IPv4  whois records when
-queried and uses a linux / unix filesystem structure for storing
-all the records. 
+on most linux and unix systems.  It is fully compliant with the
+RFC 3912.  It can serve domain name and IPv4/ IPv6 whois records 
+when queried and uses a linux / unix filesystem structure for 
+storing all the records. 
 
 Requirements:
 - Linux / Unix based operating system
@@ -31,7 +31,7 @@ in the beggining, lines 8-11, conveniently named as  following:
 LISTEN_ADDRESS,   LISTEN_PORT,   MAX_QUERY_SIZE   and   LOGFILE
 Each one is self-explanatory, but here is the explanation  just
 in case:
-- LISTEN_ADDRESS : The IPv4 Address  the  server   listens   to
+- LISTEN_ADDRESS : The IPv4/IPv6 Address the server listens  on
 - LISTEN_PORT : The Port Number where  the  server  listens  at
 - MAX_QUERY_SIZE : The maximum size, in bytes, of a valid query
                    for either an IPv4 Address or a Domain  Name
@@ -60,14 +60,12 @@ this software:
 Storage Structure:
 The database that is served by mwhois is using the linux / unix
 filesystem in order to store content. There is a  folder  named
-"db" with two primary sub-folders, "ipv4" and "domains". In the
-first folder, all whois content for IPv4 Addresses is  located,
-and in the second folder, there is all the  whois  content  for 
-the domain names. All IPv4 records are stored  in  files  named
-after the IP Address  CIDR  Block.  For  example,  the  network
-10.0.0.0/8 is stored in a file named 10.0.0.0-8  that  contains
-all the information that will be served. All the new  lines  in
-this file must be represented by <CR><LF> in order to  maintain
-full compatibility with RFC 3912. As far as  domain  names  are 
-concerned, the storage is similar, where the name of  the  file 
-is the actual domain name.
+"db" with three  sub-folders,  "ipv4",  "ipv6   and  "domains". 
+All IP records are stored in files named after the IP   Address  
+CIDR  Block.  For  example,  the  network  10.0.0.0/8 is stored
+in a file named 10.0.0.0-8  that  contains all the  information 
+that will be served. All the new  lines  in   this file must be 
+represented by <CR><LF> in order to maintain full compatibility 
+with RFC 3912. As far as domain names are concerned,the storage 
+is similar, where the name of the  file  is  the  actual domain 
+name.
