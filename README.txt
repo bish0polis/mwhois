@@ -60,7 +60,7 @@ this software:
 Storage Structure:
 The database that is served by mwhois is using the linux / unix
 filesystem in order to store content. There is a  folder  named
-"db" with three  sub-folders,  "ipv4",  "ipv6   and  "domains". 
+"db" with three  sub-folders,  "ipv4",  "ipv6"  and  "domains". 
 All IP records are stored in files named after the IP   Address  
 CIDR  Block.  For  example,  the  network  10.0.0.0/8 is stored
 in a file named 10.0.0.0-8  that  contains all the  information 
