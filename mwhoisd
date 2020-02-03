@@ -4,7 +4,7 @@ import socket, os, re
 from time import strftime
 from netaddr import IPAddress, IPNetwork 
 
-LISTEN_ADDRESS	=	"fd00:0:0:1::1"
+LISTEN_ADDRESS	=	"0.0.0.0"
 LISTEN_PORT		=	43
 MAX_QUERY_SIZE	=	128
 LOGFILE			=	"/var/log/mwhois.log"
@@ -14,7 +14,12 @@ os.system("mkdir -p db/ipv4")
 os.system("mkdir -p db/ipv6")
 os.system("mkdir -p db/domains")
 
-s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+# Listen on IPv4
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Listen on IPv6
+#s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+
 try:
 	s.bind((LISTEN_ADDRESS, LISTEN_PORT))
 except:
@@ -44,6 +49,7 @@ def isIP(qr):
 		if(num < 0 or num > 255):
 			return False
 	return True
+
 # Check if the input is a valid IPv6 Address
 def isIP6(qr):
     try:
@@ -85,14 +91,13 @@ while True:
 		log = log + query.replace("\r\n", "").replace("\n", "") + " - "
 		query = sanitizeQuery(query)	
 
-		rsp = 		"# mwhois" + n
-		
+		rsp = 		"# Whois Server" + n
 		rsp = rsp + n
 
 		if(isIP(query)):
 			# WHOIS IPv4
 			log = log + "IPv4"
-			ipdb = os.listdir("db/ipv4/")
+			ipdb = [f for f in os.listdir("db/ipv4/") if not f.startswith('.')]
 			for ipe in ipdb:
 				ipe = ipe.replace("-", "/")
 				found = False
@@ -107,13 +112,13 @@ while True:
 				rsp = rsp + n
 				rsp = rsp + "No match for "
 				rsp = rsp + query +n
-				#rsp = rsp + "# IP Address was not found in the whois database" + n
+				rsp = rsp + "# IP Address was not found in the whois database" + n
 				log = log + " (Not found)" + n
 
 		elif(isIP6(query)):
-			# WHOIS IPv4
+			# WHOIS IPv6
 			log = log + "IPv6"
-			ipdb = os.listdir("db/ipv6/")
+			ipdb = [f for f in os.listdir("db/ipv6/") if not f.startswith('.')]
 			for ipe in ipdb:
 				ipe = ipe.replace("-", "/")
 				found = False
@@ -128,14 +133,13 @@ while True:
 				rsp = rsp + n
 				rsp = rsp + "No match for "
 				rsp = rsp + query +n
-				#rsp = rsp + "# IP Address was not found in the whois database" + n
+				rsp = rsp + "# IP Address was not found in the whois database" + n
 				log = log + " (Not found)" + n
 
 		elif(isDomain(query)):
 			# WHOIS Domain
 			log = log + "Domain" + n
-			
-			domaindb = os.listdir("db/domains/")
+			domaindb = [f for f in os.listdir("db/domains/") if not f.startswith('.')]
 			for domain in domaindb:
 				found = False
 				if(query == domain):
