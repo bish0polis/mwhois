@@ -85,7 +85,7 @@ while True:
 	con, adr = s.accept()
 	log = "[" + strftime("%d/%m/%Y %H:%M:%S") + "] " + adr[0] + " - "
 	while True:
-		query = con.recv(MAX_QUERY_SIZE)
+		query = con.recv(MAX_QUERY_SIZE).decode('utf-8')
 		if not query:
 			break
 		log = log + query.replace("\r\n", "").replace("\n", "") + " - "
@@ -158,7 +158,7 @@ while True:
 			log = log + "Unrecognized" + n
 			rsp = rsp + n
 			rsp = rsp + "# Error. Unknown query type. Query is not IP or Domain " + n
-		con.send(rsp)
+		con.send(rsp.encode(encoding='utf-8'))
 		con.close()
 		if(LOGFILE!=""):
 			# Save to logs
