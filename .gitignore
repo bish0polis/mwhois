@@ -2,4 +2,5 @@
 *.DS_Store
 *.pyc
 db/ipv4/*
+db/ipv6/*
 db/domains/*

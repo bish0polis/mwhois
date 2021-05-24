@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-
 import socket, os, re
 from time import strftime
 from netaddr import IPAddress, IPNetwork 
@@ -12,9 +11,15 @@ LOGFILE			=	"/var/log/mwhois.log"
 
 n				=	"\r\n"
 os.system("mkdir -p db/ipv4")
+os.system("mkdir -p db/ipv6")
 os.system("mkdir -p db/domains")
 
+# Listen on IPv4
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Listen on IPv6
+#s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+
 try:
 	s.bind((LISTEN_ADDRESS, LISTEN_PORT))
 except:
@@ -46,6 +51,14 @@ def isIP(qr):
 			return False
 	return True
 
+# Check if the input is a valid IPv6 Address
+def isIP6(qr):
+    try:
+        socket.inet_pton(socket.AF_INET6, qr)
+    except socket.error:  # not a valid address
+        return False
+    return True
+
 # Check if the input is a valid domain name
 def isDomain(qr):
 	if(len(qr.split(".")) == 1):
@@ -73,23 +86,19 @@ while True:
 	con, adr = s.accept()
 	log = "[" + strftime("%d/%m/%Y %H:%M:%S") + "] " + adr[0] + " - "
 	while True:
-		query = con.recv(MAX_QUERY_SIZE)
+		query = con.recv(MAX_QUERY_SIZE).decode('utf-8')
 		if not query:
 			break
 		log = log + query.replace("\r\n", "").replace("\n", "") + " - "
 		query = sanitizeQuery(query)	
 
-		rsp = 		"# +-----------------------------------+" + n
-		rsp = rsp + "# |             DaKnObNET             |" + n
-		rsp = rsp + "# +-----------------------------------+" + n
-		rsp = rsp + "# |  This query was served by mwhois  |" + n
-		rsp = rsp + "# +-----------------------------------+" + n
+		rsp = 		"# Whois Server" + n
 		rsp = rsp + n
 
 		if(isIP(query)):
 			# WHOIS IPv4
 			log = log + "IPv4"
-			ipdb = os.listdir("db/ipv4/")
+			ipdb = [f for f in os.listdir("db/ipv4/") if not f.startswith('.')]
 			for ipe in ipdb:
 				ipe = ipe.replace("-", "/")
 				found = False
@@ -102,14 +111,36 @@ while True:
 					break
 			if(found == False):
 				rsp = rsp + n
+				rsp = rsp + "No match for "
+				rsp = rsp + query +n
+				rsp = rsp + "# IP Address was not found in the whois database" + n
+				log = log + " (Not found)" + n
+
+		elif(isIP6(query)):
+			# WHOIS IPv6
+			log = log + "IPv6"
+			ipdb = [f for f in os.listdir("db/ipv6/") if not f.startswith('.')]
+			for ipe in ipdb:
+				ipe = ipe.replace("-", "/")
+				found = False
+				if(isIPinCIDR(query, ipe)):
+					dd = open("db/ipv6/" + ipe.replace("/", "-"), "r")
+					rsp = rsp + dd.read()
+					dd.close()
+					found = True
+					log = log + n
+					break
+			if(found == False):
+				rsp = rsp + n
+				rsp = rsp + "No match for "
+				rsp = rsp + query +n
 				rsp = rsp + "# IP Address was not found in the whois database" + n
 				log = log + " (Not found)" + n
 
 		elif(isDomain(query)):
 			# WHOIS Domain
 			log = log + "Domain" + n
-			
-			domaindb = os.listdir("db/domains/")
+			domaindb = [f for f in os.listdir("db/domains/") if not f.startswith('.')]
 			for domain in domaindb:
 				found = False
 				if(query == domain):
@@ -127,8 +158,8 @@ while True:
 			# Unrecognized	
 			log = log + "Unrecognized" + n
 			rsp = rsp + n
-			rsp = rsp + "# Error. Unknown query type. Query is not IPv4 or Domain " + n
-		con.send(rsp)
+			rsp = rsp + "# Error. Unknown query type. Query is not IP or Domain " + n
+		con.send(rsp.encode(encoding='utf-8'))
 		con.close()
 		if(LOGFILE!=""):
 			# Save to logs
