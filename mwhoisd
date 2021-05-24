@@ -28,7 +28,8 @@ def sanitizeQuery(qr):
 	qr = qr.replace("..", ".")
 	qr = qr.replace("/", "")
 	qr = qr.replace("\\", "")
-	qr = qr.replace(n, "")
+	qr = qr.replace("\r", "")
+	qr = qr.replace("\n", "")
 	return qr
 
 # Check if the input is a valid IPv4 Address
