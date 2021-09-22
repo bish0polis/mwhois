@@ -2,7 +2,7 @@ mwhois
 Copyright (c) 2015 Antonios A. Chariton <daknob.mac@gmail.com>
 
 Description: 
-mwhois is a server software compatible with the whois(1) command
+mwhois is server software compatible with the whois(1) command
 on most Linux and Unix systems.  It is fully compliant with the
 RFC 3912.  It can serve domain name and IPv4/ IPv6 whois records 
 when queried and uses a Linux / Unix filesystem structure for 
